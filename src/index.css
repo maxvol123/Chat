@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+  margin: 0;
+}
+.login_btn{
+  background-color: rgba(0, 0, 0, 0.213);
+  width: auto;
+}
