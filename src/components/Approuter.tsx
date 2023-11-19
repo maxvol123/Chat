@@ -19,7 +19,7 @@ const Approuter = () => {
            {publicRoutes.map(({path, Component})=>
                 <Route path={path} element={<Component/>}/>
             )}
-            <Navigate to={LOGIN_ROUTE}/>
+            <Route path="*" element={<Navigate to={LOGIN_ROUTE} />}/>
         </Routes>
     )
 };
