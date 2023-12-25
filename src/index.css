@@ -8,3 +8,6 @@ body {
   background-color: rgba(0, 0, 0, 0.213);
   width: auto;
 }
+input{
+  outline: 0;
+}

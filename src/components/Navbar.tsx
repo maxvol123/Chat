@@ -1,6 +1,7 @@
 import {useContext} from "react"
 import { Context } from '..';
 import {useAuthState} from 'react-firebase-hooks/auth'
+import Loader from "./Loader";
 const Navbar = () => {
     const {auth} = useContext(Context)
     const [user] = useAuthState(auth)
