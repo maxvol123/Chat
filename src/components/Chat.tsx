@@ -11,23 +11,30 @@ const Chat = () => {
         firestore.collection("messages").orderBy('createdAt')
     )
     async function send() {
-        firestore.collection('messages').add({
-            uid: user?.uid,
-            displayName: user?.displayName,
-            photoUrl: user?.photoURL,
-            text: message,
-            createdAt: 0
-        })
-        setMessage("")
+        try {
+            firestore.collection('messages').add({
+                uid: user?.uid,
+                displayName: user?.displayName,
+                photoUrl: user?.photoURL,
+                text: message,
+            })
+            console.log(messages);
+            setMessage("")
+        } catch (error) {
+            console.log(error);
+            
+        }
+
     }
-    console.log(messages);
-    
+    const handleSubmit = (event:any) => {
+        event.preventDefault();
+      }
     return (
         <div className='flex h-[75vh]'>
             <div className="w-[20%] h-full border-gray-100 border-2"></div>
             <div className="w-[80%] h-90vh border-gray-100 border-2">
                 <div className="h-[90%]"></div>
-                <form className="h-[10%] pb-2 flex">
+                <form className="h-[10%] pb-2 flex" onSubmit={handleSubmit}>
                     <input type="text" value={message} onChange={(e)=>{setMessage(e.target.value)}} className=' mx-3 px-2 text-xl h-[100%] w-[90%] border-2 border-gray-100 rounded-xl'/>
                     <input type='submit' value={"send"} className='w-[10%]' onClick={()=>{send()}}/>
                 </form>
