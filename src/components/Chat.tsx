@@ -4,6 +4,8 @@ import { Context } from '..';
 import {useAuthState} from 'react-firebase-hooks/auth'
 import {useCollectionData} from 'react-firebase-hooks/firestore'
 import axios from 'axios';
+import firebase from 'firebase/compat';
+import { serverTimestamp } from 'firebase/firestore';
 const Chat = () => {
     const {auth, firestore} = useContext(Context)
     const [user] = useAuthState(auth)
@@ -26,16 +28,18 @@ const Chat = () => {
     async function send() {
         try {
             GetTime()
-            firestore.collection('messages').add({
+            await firestore.collection('messages').add({
                 uid: user?.uid,
                 displayName: user?.displayName,
                 photoUrl: user?.photoURL,
                 text: message,
                 touid:touid,
-                createdAt:time
+                createdAt:serverTimestamp()
             })
             console.log(messages);
             setMessage("")
+            let element = document.querySelector('#element');
+            element!.scrollTop = element!.scrollHeight;
         } catch (error) {
             console.log(error);
             
@@ -49,10 +53,14 @@ const Chat = () => {
         <div className='flex h-[75vh]'>
             <div className="w-[20%] h-full border-gray-100 border-2 "></div>
             <div className="w-[80%] h-90vh border-gray-100 border-2">
-                <div className="h-[90%] justify-end justify-self-end p-10 overflow-y-scroll	">
+                <div className="h-[90%] justify-end justify-self-end p-10 overflow-y-scroll	" id='element'>
                     {messages?.map((message)=>
-                    <div className='ml-auto p-5 my-2 border w-1/2'>
-                        {message.text}
+                    <div className={`${message.uid==user?.uid?"ml-auto":"mr-auto"} p-5 my-2 border flex flex-col max-w-[50%]` }>
+                        <div className="flex mb-2">
+                        <img src={message.photoUrl} alt="" className='h-10 w-10 mr-auto' />
+                        <div className="text-xs">{message.displayName}</div>
+                        </div>
+                        <div className="text-xl">{message.text}</div>
                     </div>
                     )}
                 </div>
