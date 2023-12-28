@@ -4,17 +4,27 @@ import { Context } from '..';
 import {useAuthState} from 'react-firebase-hooks/auth'
 import {useCollectionData} from 'react-firebase-hooks/firestore'
 import axios from 'axios';
-import firebase from 'firebase/compat';
-import { serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, where } from 'firebase/firestore';
+
+import { query, serverTimestamp } from 'firebase/firestore';
 const Chat = () => {
     const {auth, firestore} = useContext(Context)
     const [user] = useAuthState(auth)
     const [message, setMessage] = useState('')
-    const [touid, setTouid] = useState('')
+    const [touid, setTouid] = useState('1')
     const [time, setTime] = useState('')
+    // const [currentuid, setCurrentuid]= useState('')
     const [messages, loading] = useCollectionData(
         firestore.collection("messages").orderBy('createdAt')
-    )
+    )    
+    const uniqueUids = messages?.map((message)=>{
+        if (message.uid) {
+            
+        }
+    })
+    const filteredArray = messages?.filter(
+        (message) => message.uid === user?.uid && (message.touid===user?.uid || message.touid===touid) || message.uid === touid 
+      );
         const GetTime = async () => {
           try {
             const response = await axios.get('http://worldtimeapi.org/api/timezone/Europe/London');
@@ -23,7 +33,8 @@ const Chat = () => {
             console.log(error);
           }
         };
-    
+        console.log(filteredArray);
+
         
     async function send() {
         try {
@@ -54,7 +65,7 @@ const Chat = () => {
             <div className="w-[20%] h-full border-gray-100 border-2 "></div>
             <div className="w-[80%] h-90vh border-gray-100 border-2">
                 <div className="h-[90%] justify-end justify-self-end p-10 overflow-y-scroll	" id='element'>
-                    {messages?.map((message)=>
+                    {filteredArray?.map((message)=>
                     <div className={`${message.uid==user?.uid?"ml-auto":"mr-auto"} p-5 my-2 border flex flex-col max-w-[50%]` }>
                         <div className="flex mb-2">
                         <img src={message.photoUrl} alt="" className='h-10 w-10 mr-auto' />
