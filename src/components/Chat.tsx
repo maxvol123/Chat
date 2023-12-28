@@ -10,35 +10,23 @@ import { query, serverTimestamp } from 'firebase/firestore';
 const Chat = () => {
     const {auth, firestore} = useContext(Context)
     const [user] = useAuthState(auth)
+    const userId = user?.uid
     const [message, setMessage] = useState('')
-    const [touid, setTouid] = useState('1')
+    const [touid, setTouid] = useState('')
     const [time, setTime] = useState('')
-    // const [currentuid, setCurrentuid]= useState('')
     const [messages, loading] = useCollectionData(
         firestore.collection("messages").orderBy('createdAt')
     )    
-    const uniqueUids = messages?.map((message)=>{
-        if (message.uid) {
-            
-        }
-    })
+    const users = Array.from(new Set(messages?.map(message => message.uid)));
     const filteredArray = messages?.filter(
-        (message) => message.uid === user?.uid && (message.touid===user?.uid || message.touid===touid) || message.uid === touid 
-      );
-        const GetTime = async () => {
-          try {
-            const response = await axios.get('http://worldtimeapi.org/api/timezone/Europe/London');
-            setTime(response.data.datetime)
-          } catch (error) {
-            console.log(error);
-          }
-        };
-        console.log(filteredArray);
-
-        
+        (message) => (message.touid === user?.uid && message.uid==touid) || (message.uid === user?.uid&&message.touid === touid) 
+      );  
+      console.log(filteredArray);
+      
     async function send() {
-        try {
-            GetTime()
+        console.log(touid);
+        
+        try {            
             await firestore.collection('messages').add({
                 uid: user?.uid,
                 displayName: user?.displayName,
@@ -47,10 +35,11 @@ const Chat = () => {
                 touid:touid,
                 createdAt:serverTimestamp()
             })
-            console.log(messages);
             setMessage("")
             let element = document.querySelector('#element');
             element!.scrollTop = element!.scrollHeight;
+            console.log(messages);
+            
         } catch (error) {
             console.log(error);
             
@@ -62,7 +51,21 @@ const Chat = () => {
       }
     return (
         <div className='flex h-[75vh]'>
-            <div className="w-[20%] h-full border-gray-100 border-2 "></div>
+            <div className="w-[20%] h-full border-gray-100 border-2 ">
+                {users.map((user)=>{
+                    
+                    if (user==userId) {
+                        return
+                    }
+                        const foundMessage = messages?.find((message) => message.uid === user);                        
+                return (
+                <div className="flex h-14 border-gray-100 border-2 cursor-pointer mb-2 p-2" onClick={()=>setTouid(user)}>
+                    <img src={foundMessage?.photoUrl} alt="" className='h-10 w-10 mr-auto' />
+                    <div className="mt-auto mb-auto">{foundMessage?.displayName}</div>    
+                </div>
+                )}
+                )}
+            </div>
             <div className="w-[80%] h-90vh border-gray-100 border-2">
                 <div className="h-[90%] justify-end justify-self-end p-10 overflow-y-scroll	" id='element'>
                     {filteredArray?.map((message)=>
